@@ -24,35 +24,37 @@ export async function POST(req) {
 		const text = formData.get("text");
 		const html = formData.get("html");
 
-		if (typeof from !== "string" || from.trim() === "")
-			throw new Error("from field was invalid"); // something like that // Format timestamp to Chicago time
+		console.log(to);
 
-		const now = new Date();
-		const chicagoTime = now.toLocaleString("en-US", {
-			timeZone: "America/Chicago",
-			hour12: true,
-		}); // Connect to Neon/Postgres
+// 		if (typeof from !== "string" || from.trim() === "")
+// 			throw new Error("from field was invalid"); // something like that // Format timestamp to Chicago time
 
-		const sql = neon(process.env.DATABASE_URL); // Insert parsed email into your table
+// 		const now = new Date();
+// 		const chicagoTime = now.toLocaleString("en-US", {
+// 			timeZone: "America/Chicago",
+// 			hour12: true,
+// 		}); // Connect to Neon/Postgres
 
-		const result = await sql`INSERT INTO edgar_teams (
-        from_email,
-        to_email,
-        subject,
-        text_body,
-        html_body,
-        timestamp
-      )
-     
-      VALUES (
-        ${from},
-        ${to},
-        ${subject},
-        ${text},
-        ${html},
-        ${chicagoTime}
-      );`;
-		console.log("✅ Email inserted:", result);
+// 		const sql = neon(process.env.DATABASE_URL); // Insert parsed email into your table
+
+// 		const result = await sql`INSERT INTO edgar_teams (
+//         from_email,
+//         to_email,
+//         subject,
+//         text_body,
+//         html_body,
+//         timestamp
+//       )
+//      
+//       VALUES (
+//         ${from},
+//         ${to},
+//         ${subject},
+//         ${text},
+//         ${html},
+//         ${chicagoTime}
+//       );`;
+// 		console.log("✅ Email inserted:", result);
 
 		return NextResponse.json({ message: "Email received" }, { status: 200 });
 	} catch (error) {

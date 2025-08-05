@@ -6,7 +6,7 @@ export async function GET(request) {
 
 	try {
 		const result = await sql`
-			CREATE TABLE test1 (
+			CREATE TABLE test11 (
 				email varchar(255),
 				campId varchar(255),
 				date varchar(255)
