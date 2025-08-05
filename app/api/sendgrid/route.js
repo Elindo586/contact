@@ -24,7 +24,7 @@ export async function POST(req) {
 		const text = formData.get("text");
 		const html = formData.get("html");
 
-		console.log(to);
+		
 
 // 		if (typeof from !== "string" || from.trim() === "")
 // 			throw new Error("from field was invalid"); // something like that // Format timestamp to Chicago time
@@ -56,7 +56,7 @@ export async function POST(req) {
 //       );`;
 // 		console.log("✅ Email inserted:", result);
 
-		return NextResponse.json({ message: "Email received" }, { status: 200 });
+		return NextResponse.json({ message: `Email received ${to}` }, { status: 200 });
 	} catch (error) {
 		console.error("❌ Error:", error);
 		return NextResponse.json({ error: error.message }, { status: 500 });
