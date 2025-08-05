@@ -5,15 +5,15 @@ import { NextResponse } from "next/server";
 console.log("testing");
 
 // Helper to parse multipart/form-data using formidable with a Promise
-// const parseForm = async (req) =>
-// 	new Promise((resolve, reject) => {
-// 		const form = new IncomingForm();
+const parseForm = async (req) =>
+	new Promise((resolve, reject) => {
+		const form = new IncomingForm();
 
-// 		form.parse(req, (err, fields, files) => {
-// 			if (err) return reject(err);
-// 			resolve(fields);
-// 		});
-// 	});
+		form.parse(req, (err, fields, files) => {
+			if (err) return reject(err);
+			resolve(fields);
+		});
+	});
 
 export async function POST(req) {
 	try {
