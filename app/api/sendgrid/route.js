@@ -1,19 +1,19 @@
 import { neon } from "@neondatabase/serverless";
-import { IncomingForm } from "formidable";
+// import { IncomingForm } from "formidable";
 import { NextResponse } from "next/server";
 
 console.log("testing");
 
 // Helper to parse multipart/form-data using formidable with a Promise
-const parseForm = async (req) =>
-	new Promise((resolve, reject) => {
-		const form = new IncomingForm();
+// const parseForm = async (req) =>
+// 	new Promise((resolve, reject) => {
+// 		const form = new IncomingForm();
 
-		form.parse(req, (err, fields, files) => {
-			if (err) return reject(err);
-			resolve(fields);
-		});
-	});
+// 		form.parse(req, (err, fields, files) => {
+// 			if (err) return reject(err);
+// 			resolve(fields);
+// 		});
+// 	});
 
 export async function POST(req) {
 	try {
@@ -23,8 +23,6 @@ export async function POST(req) {
 		const subject = formData.get("subject");
 		const text = formData.get("text");
 		const html = formData.get("html");
-
-	
 
 		if (typeof from !== "string" || from.trim() === "")
 			throw new Error("from field was invalid"); // something like that // Format timestamp to Chicago time
@@ -56,7 +54,10 @@ export async function POST(req) {
       );`;
 		console.log("✅ Email inserted:", result);
 
-		return NextResponse.json({ message: `Email received ${to}` }, { status: 200 });
+		return NextResponse.json(
+			{ message: `Email received ${from} | ${to}` },
+			{ status: 200 }
+		);
 	} catch (error) {
 		console.error("❌ Error:", error);
 		return NextResponse.json({ error: error.message }, { status: 500 });
