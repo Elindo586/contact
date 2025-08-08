@@ -17,7 +17,7 @@ export default async function handler(req, res) {
       for (const event of eventData) {
         // Extract relevant fields for each event
         const {
-          teams,
+          
           email,
           event: eventType, // 'event' is a reserved keyword, renamed here
           timestamp,
@@ -75,7 +75,7 @@ export default async function handler(req, res) {
             chicago_time
           )
           VALUES (
-            ${teams},
+            teams,
             ${email},
             ${eventType},
             ${timestamp},
