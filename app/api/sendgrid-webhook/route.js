@@ -1,28 +1,3 @@
-import crypto from "crypto";
-import { neon } from "@neondatabase/serverless";
-
-// Initialize Neon client
-const sql = neon(process.env.DATABASE_URL);
-
-// Secret key from SendGrid, stored securely (you should keep it in environment variables)
-const SENDGRID_SECRET = process.env.SENDGRID_API_KEY;
-
-// Function to verify SendGrid's signature
-const verifySendGridSignature = (req) => {
-  const signature = req.headers["x-signature"];
-  const timestamp = req.headers["x-timestamp"];
-  const body = JSON.stringify(req.body);
-
-  // Generate the expected signature
-  const data = `${timestamp}${body}`;
-  const hash = crypto
-    .createHmac("sha256", SENDGRID_SECRET)
-    .update(data)
-    .digest("hex");
-
-  return signature === hash;
-};
-
 // API route to catch the SendGrid webhook
 export default async function handler(req, res) {
   if (req.method === "POST") {
@@ -74,65 +49,61 @@ export default async function handler(req, res) {
         // Get current Chicago time in ISO format
         const chicagoTime = new Date().toISOString();
 
-        // Check if the event comes from the desired 'teams'
-        if (teams === "teams.tu.biz") {
-          const result = await sql`
-            INSERT INTO webhook (
-              teams,
-              email,
-              event,
-              timestamp,
-              sg_event_id,
-              sg_message_id,
-              reason,
-              status,
-              response,
-              useragent,
-              ip,
-              category,
-              asm_group_id,
-              marketing_campaign_id,
-              marketing_campaign_name,
-              attempt,
-              pool,
-              sg_machine_open,
-              bounce_classification,
-              type,
-              chicago_time
-            )
-            VALUES (
-              ${teams},
-              ${email},
-              ${eventType},
-              ${timestamp},
-              ${sg_event_id},
-              ${sg_message_id},
-              ${reason},
-              ${status},
-              ${response},
-              ${useragent},
-              ${ip},
-              ${category},
-              ${asm_group_id},
-              ${marketing_campaign_id},
-              ${marketing_campaign_name},
-              ${attempt},
-              ${pool},
-              ${sg_machine_open},
-              ${bounce_classification},
-              ${type},
-              ${chicagoTime}
-            );
-          `;
-          
-          // Increment successful insert count if insertion was successful
-          if (result.rowCount > 0) {
-            successfulInserts++;
-          } else {
-            console.log(`Failed to insert event with sg_event_id: ${sg_event_id}`);
-          }
+        // Just insert the event, no team condition
+        const result = await sql`
+          INSERT INTO webhook (
+            teams,
+            email,
+            event,
+            timestamp,
+            sg_event_id,
+            sg_message_id,
+            reason,
+            status,
+            response,
+            useragent,
+            ip,
+            category,
+            asm_group_id,
+            marketing_campaign_id,
+            marketing_campaign_name,
+            attempt,
+            pool,
+            sg_machine_open,
+            bounce_classification,
+            type,
+            chicago_time
+          )
+          VALUES (
+            ${teams},
+            ${email},
+            ${eventType},
+            ${timestamp},
+            ${sg_event_id},
+            ${sg_message_id},
+            ${reason},
+            ${status},
+            ${response},
+            ${useragent},
+            ${ip},
+            ${category},
+            ${asm_group_id},
+            ${marketing_campaign_id},
+            ${marketing_campaign_name},
+            ${attempt},
+            ${pool},
+            ${sg_machine_open},
+            ${bounce_classification},
+            ${type},
+            ${chicagoTime}
+          );
+        `;
+
+        // Increment successful insert count if insertion was successful
+        if (result.rowCount > 0) {
+          successfulInserts++;
         } else {
-          console.log("Event wasn't from the expected team");
+          console.log(`Failed to insert event with sg_event_id: ${sg_event_id}`);
         }
       }
 
