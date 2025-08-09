@@ -9,7 +9,10 @@
     "@neondatabase/serverless": "^1.0.1",
     "bootstrap": "^5.3.7",
     "formidable": "^3.5.4",
+    "mailparser": "^3.7.4",
+    "mime": "^4.0.7",
     "next": "^15.4.5",
+    "querystring": "^0.2.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
   },
