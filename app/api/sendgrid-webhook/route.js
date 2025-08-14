@@ -8,14 +8,13 @@ console.log(SENDGRID_SECRET);
 
 // Function to verify the SendGrid webhook signature
 export function verifySendGridSignature(req) {
-	const signature = req.headers["x-twilio-email-event-webhook-signature"];
-	const timestamp = req.headers["x-twilio-email-event-webhook-timestamp"];
-  // console.log(req.headers);
-  // console.log('Header Keys:', Object.keys(req.headers));
-  // console.log(`signature: ${signature}`);
-  // console.log(`timestamp: ${timestamp}`);
+	const signature = req.headers.get("x-twilio-email-event-webhook-signature");
+	const timestamp = req.headers.get("x-twilio-email-event-webhook-timestamp");
 
-	
+	// console.log(req.headers);
+	// console.log('Header Keys:', Object.keys(req.headers));
+	// console.log(`signature: ${signature}`);
+	// console.log(`timestamp: ${timestamp}`);
 
 	// Concatenate the timestamp and body of the request to form the message
 	const message = `${timestamp}${JSON.stringify(req.body)}`;
