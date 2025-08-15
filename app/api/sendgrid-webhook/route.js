@@ -189,7 +189,7 @@ export async function POST(req) {
       }
     }
 
-    // Verify inserts by querying the database
+    // Verify inserts by querying the database hello!
     if (successfulInserts > 0) {
       try {
         const insertedIds = eventData
