@@ -9,10 +9,10 @@ export async function GET(request) {
     // Drop the 'teams' column from the 'webhook' table
     const result = await sql`
       ALTER TABLE webhook
-      DROP COLUMN IF EXISTS unique_args;
+      ALTER COLUMN category TYPE TEXT[] USING ARRAY[category];
     `;
 
-    return NextResponse.json({ message: "Column dropped successfully", result }, { status: 200 });
+    return NextResponse.json({ message: "It has been changed.", result }, { status: 200 });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: error.message }, { status: 500 });
