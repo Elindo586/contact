@@ -51,7 +51,7 @@ class EventWebhookHeader {
   }
 }
 
-const SENDGRID_SECRET = process.env.SENDGRID_SECRET;
+const SENDGRID_SECRET = process.env.SENDGRID_SECRET.replace(/\\n/g, '\n');
 const sql = neon(process.env.DATABASE_URL);
 
 export const config = {
