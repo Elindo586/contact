@@ -149,11 +149,11 @@ export async function POST(req) {
       }
 
       // Only insert data if teams field is present and equals "teams.tu.biz" might work!
-    //   if (!teams || teams !== 'teams.tu.biz') {
-    //     console.log(`Skipping event with sg_event_id: ${sg_event_id} due to missing or invalid teams value`);
-    //     errors.push(`Skipping event with sg_event_id: ${sg_event_id} due to missing or invalid teams value`);
-    //     continue;
-    //   }
+      if (!teams || teams !== 'teams.tu.biz') {
+        console.log(`Skipping event with sg_event_id: ${sg_event_id} due to missing or invalid teams value`);
+        errors.push(`Skipping event with sg_event_id: ${sg_event_id} due to missing or invalid teams value`);
+        continue;
+      }
 
       const categoryValue = Array.isArray(category) ? category : [category] || null;
       const now = new Date();
