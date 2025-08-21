@@ -100,7 +100,7 @@ export async function POST(req) {
         console.log(`Teams value for sg_event_id: ${sg_event_id}: ${teams}`);
       }
 
-      // Only insert data if teams field is present and equals "teams.tu.biz"
+      // Only insert data if teams field is present and equals "teams.tu.biz" might work!
       if (!teams || teams !== "teams.tu.biz") {
         console.log(`Skipping event with sg_event_id: ${sg_event_id} due to missing or invalid teams value`);
         errors.push(`Skipping event with sg_event_id: ${sg_event_id} due to missing or invalid teams value`);
