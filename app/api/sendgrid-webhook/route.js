@@ -4,43 +4,30 @@ import { neon } from '@neondatabase/serverless';
 import { NextResponse } from 'next/server';
 import { Ecdsa, Signature, PublicKey } from 'starkbank-ecdsa';
 
-/*
- * This class allows you to use the Event Webhook feature. Read the docs for
- * more details: https://sendgrid.com/docs/for-developers/tracking-events/event
- */
 class EventWebhook {
-  /**
-   * Convert the public key string to a ECPublicKey.
-   *
-   * @param {string} publicKey verification key under Mail Settings
-   * @return {PublicKey} A public key using the ECDSA algorithm
-   */
   convertPublicKeyToECDSA(publicKey) {
     return PublicKey.fromPem(publicKey);
   }
 
-  /**
-   * Verify signed event webhook requests.
-   *
-   * @param {PublicKey} publicKey elliptic curve public key
-   * @param {string|Buffer} payload event payload in the request body
-   * @param {string} signature value obtained from the 'X-Twilio-Email-Event-Webhook-Signature' header
-   * @param {string} timestamp value obtained from the 'X-Twilio-Email-Event-Webhook-Timestamp' header
-   * @return {Boolean} true or false if signature is valid
-   */
   verifySignature(publicKey, payload, signature, timestamp) {
-    let timestampPayload = Buffer.isBuffer(payload) ? payload.toString() : payload;
-    timestampPayload = timestamp + timestampPayload;
-    const decodedSignature = Signature.fromBase64(signature);
-
-    return Ecdsa.verify(timestampPayload, decodedSignature, publicKey);
+    const signedPayload = timestamp + payload;
+    console.log('Signature Verification Payload:', signedPayload);
+    console.log('Signature:', signature);
+    console.log('Timestamp:', timestamp);
+    console.log('Payload Length:', payload.length);
+    console.log('Payload:', payload);
+    
+    try {
+      const decodedSignature = Signature.fromBase64(signature);
+      console.log('Decoded Signature:', decodedSignature.toString());
+      return Ecdsa.verify(signedPayload, decodedSignature, publicKey);
+    } catch (err) {
+      console.error('ECDSA Verification Error:', err);
+      return false;
+    }
   }
 }
 
-/*
- * This class lists headers that get posted to the webhook. Read the docs for
- * more details: https://sendgrid.com/docs/for-developers/tracking-events/event
- */
 class EventWebhookHeader {
   static SIGNATURE() {
     return 'X-Twilio-Email-Event-Webhook-Signature';
@@ -69,25 +56,29 @@ export async function POST(req) {
     const signature = req.headers.get(EventWebhookHeader.SIGNATURE());
     const timestamp = req.headers.get(EventWebhookHeader.TIMESTAMP());
 
-    let rawBody;
-    try {
-      rawBody = await req.text();
-    } catch (err) {
-      console.error('Failed to read request body:', err);
-      return NextResponse.json({ error: 'Failed to read request body' }, { status: 400 });
+    if (!signature || !timestamp) {
+      console.log('Missing signature or timestamp');
+      return NextResponse.json({ error: 'Missing signature or timestamp' }, { status: 400 });
     }
 
-    const normalizedBody = rawBody.trim();
+    const rawBody = await req.text();
+    console.log('Raw Body Length:', rawBody.length);
+    console.log('Raw Body:', rawBody);
+    console.log('SENDGRID_SECRET (first 50 chars):', SENDGRID_SECRET.substring(0, 50));
+    console.log('Content-Type:', req.headers.get('content-type'));
+
+    // Verify timestamp window
+    const currentTime = Math.floor(Date.now() / 1000);
+    if (Math.abs(currentTime - parseInt(timestamp)) > 300) {
+      console.log('Timestamp outside 5-minute window:', timestamp);
+      console.log('Server Time (Unix):', currentTime);
+      return NextResponse.json({ error: 'Timestamp too old or in future' }, { status: 403 });
+    }
+
     const eventWebhook = new EventWebhook();
     const publicKey = eventWebhook.convertPublicKeyToECDSA(SENDGRID_SECRET);
-
-    let isValidSignature;
-    try {
-      isValidSignature = eventWebhook.verifySignature(publicKey, normalizedBody, signature, timestamp);
-    } catch (err) {
-      console.error('Error during ECDSA verification:', err);
-      return NextResponse.json({ error: 'Error verifying signature' }, { status: 403 });
-    }
+    const isValidSignature = eventWebhook.verifySignature(publicKey, rawBody, signature, timestamp);
+    console.log('Signature Valid:', isValidSignature);
 
     if (!isValidSignature) {
       console.log('Signature verification failed.');
@@ -96,7 +87,7 @@ export async function POST(req) {
 
     let eventData;
     try {
-      eventData = JSON.parse(normalizedBody);
+      eventData = JSON.parse(rawBody);
       console.log('Parsed eventData:', JSON.stringify(eventData, null, 2));
     } catch (err) {
       console.error('Failed to parse JSON:', err);
@@ -143,12 +134,6 @@ export async function POST(req) {
         continue;
       }
 
-      // Log teams if present
-      if (teams) {
-        console.log(`Teams value for sg_event_id: ${sg_event_id}: ${teams}`);
-      }
-
-      // Only insert data if teams field is present and equals "teams.tu.biz" might work!
       if (!teams || teams !== 'teams.tu.biz') {
         console.log(`Skipping event with sg_event_id: ${sg_event_id} due to missing or invalid teams value`);
         errors.push(`Skipping event with sg_event_id: ${sg_event_id} due to missing or invalid teams value`);
@@ -237,7 +222,6 @@ export async function POST(req) {
       }
     }
 
-    // Verify inserts by querying the database hello!
     if (successfulInserts > 0) {
       try {
         const insertedIds = eventData
@@ -253,27 +237,15 @@ export async function POST(req) {
       }
     }
 
-    if (successfulInserts > 0) {
-      return NextResponse.json(
-        {
-          message: 'Webhook received and data processed',
-          successfulInserts,
-          eventCount: eventData.length,
-          errors: errors.length > 0 ? errors : undefined,
-        },
-        { status: 200 }
-      );
-    } else {
-      return NextResponse.json(
-        {
-          error: 'Failed to process events',
-          successfulInserts,
-          eventCount: eventData.length,
-          errors: errors.length > 0 ? errors : undefined,
-        },
-        { status: 400 }
-      );
-    }
+    return NextResponse.json(
+      {
+        message: 'Webhook received and data processed',
+        successfulInserts,
+        eventCount: eventData.length,
+        errors: errors.length > 0 ? errors : undefined,
+      },
+      { status: 200 }
+    );
   } catch (err) {
     console.error('General error:', err);
     return NextResponse.json({ error: err.message }, { status: 500 });
