@@ -7,6 +7,7 @@ import QRCode from "qrcode";
 import VCardGenerator from "./VCardGenerator";
 import styles from "../app/card/styles.module.css";
 
+
 const BusinessCard = () => {
   // Contact details (customize these)
   const contact = {
@@ -41,7 +42,7 @@ const BusinessCard = () => {
       {/* Profile Image (optional) */}
       <div className={styles.profileImageContainer}>
         <Image
-          src="/profile.jpg"
+          src="../../image/profile.png"
           alt="Profile"
           width={100}
           height={100}
