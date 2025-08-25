@@ -42,7 +42,7 @@ const BusinessCard = () => {
       {/* Profile Image (optional) */}
       <div className={styles.profileImageContainer}>
         <Image
-          src="../../image/profile.png"
+          src="/image/profile.png"
           alt="Profile"
           width={100}
           height={100}
