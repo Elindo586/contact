@@ -23,7 +23,7 @@ const BusinessCard = () => {
   };
 
   // URL for QR code (use deployed URL or localhost)
-  const cardUrl = process.env.NEXT_PUBLIC_BASE_URL;
+  const cardUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://example.com";
   const [qrCodeUrl, setQrCodeUrl] = useState("");
 
   // Generate QR code
@@ -70,7 +70,7 @@ const BusinessCard = () => {
         </p>
          <p>
           <span className={styles.detailLabel}>WhatsApp</span>{" "}
-          <a href={`tel:${contact.whatsApp}`} className={styles.detailLink}>
+          <a href={`${contact.whatsApp}`} className={styles.detailLink}>
             {contact.whatsAppNumber}
           </a>
         </p>

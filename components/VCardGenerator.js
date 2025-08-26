@@ -14,6 +14,7 @@ ORG:${contact.company}
 EMAIL;TYPE=WORK:${contact.email}
 TEL;TYPE=WORK:${contact.phone}
 TEL;TYPE=CELL:${contact.whatsAppNumber} ;WhatsApp
+NOTE:WhatsApp:${contact.whatsApp}
 URL:${contact.website}
 ADR;TYPE=WORK:;;${contact.address};;;;
 END:VCARD`;
