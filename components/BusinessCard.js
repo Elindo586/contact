@@ -19,7 +19,7 @@ const BusinessCard = () => {
     whatsApp: "https://wa.me/15866125270",
     whatsAppNumber: "+1-586-612-5270",
     website: "https://www.tu.biz",
-    address: "Arlington Heights, IL 6004",
+    address: "Arlington Heights, IL 60043",
   };
 
   // URL for QR code (use deployed URL or localhost)
