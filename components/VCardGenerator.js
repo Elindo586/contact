@@ -13,8 +13,7 @@ TITLE:${contact.title}
 ORG:${contact.company}
 EMAIL;TYPE=WORK:${contact.email}
 TEL;TYPE=WORK:${contact.phone}
-TEL;TYPE=CELL:${contact.whatsAppNumber} ;WhatsApp
-NOTE:WhatsApp:${contact.whatsApp}
+NOTE:WhatsApp:${contact.whatsAppNumber}
 URL:${contact.website}
 ADR;TYPE=WORK:;;${contact.address};;;;
 END:VCARD`;

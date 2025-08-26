@@ -7,9 +7,7 @@ import QRCode from "qrcode";
 import VCardGenerator from "./VCardGenerator";
 import styles from "../app/card/styles.module.css";
 
-
 const BusinessCard = () => {
-  // Contact details (customize these)
   const contact = {
     name: "Edgar Lindo",
     title: "Sales Engineer",
@@ -22,35 +20,46 @@ const BusinessCard = () => {
     address: "Arlington Heights, IL 60043",
   };
 
-  // URL for QR code (use deployed URL or localhost)
-  const cardUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const [qrCodeUrl, setQrCodeUrl] = useState("");
 
-  // Generate QR code
+  // Generate vCard string for QR code
+  const vCard = `BEGIN:VCARD
+VERSION:3.0
+FN:${contact.name}
+TITLE:${contact.title}
+ORG:${contact.company}
+EMAIL;TYPE=WORK:${contact.email}
+TEL;TYPE=WORK:${contact.phone}
+TEL;TYPE=CELL:${contact.whatsAppNumber}
+NOTE:WhatsApp:${contact.whatsAppNumber}
+URL:${contact.website}
+ADR;TYPE=WORK:;;${contact.address};;;;
+END:VCARD`;
+
+  // Generate QR code with vCard data
   useEffect(() => {
-    QRCode.toDataURL(cardUrl, { width: 200, margin: 1 }, (err, url) => {
+    QRCode.toDataURL(vCard, { width: 200, margin: 1 }, (err, url) => {
       if (err) {
         console.error("QR Code generation error:", err);
         return;
       }
       setQrCodeUrl(url);
     });
-  }, [cardUrl]);
+  }, [vCard]);
 
   return (
     <div className={styles.cardContainer}>
-      {/* Profile Image (optional) */}
       <div className={styles.profileImageContainer}>
         <Image
           src="/image/profile.png"
-          alt="Profile"
+          alt={`Profile picture of ${contact.name}`}
           width={100}
           height={100}
           className={styles.profileImage}
+          priority
         />
       </div>
 
-      {/* Contact Details */}
       <h1 className={styles.cardName}>{contact.name}</h1>
       <p className={styles.cardTitle}>{contact.title}</p>
       <p className={styles.cardCompany}>{contact.company}</p>
@@ -68,9 +77,9 @@ const BusinessCard = () => {
             {contact.phone}
           </a>
         </p>
-         <p>
-          <span className={styles.detailLabel}>WhatsApp</span>{" "}
-          <a href={`${contact.whatsApp}`} className={styles.detailLink}>
+        <p>
+          <span className={styles.detailLabel}>WhatsApp:</span>{" "}
+          <a href={contact.whatsApp} className={styles.detailLink}>
             {contact.whatsAppNumber}
           </a>
         </p>
@@ -90,21 +99,21 @@ const BusinessCard = () => {
         </p>
       </div>
 
-      {/* QR Code */}
       <div className={styles.qrCodeContainer}>
         <p className={styles.qrCodeLabel}>Scan to save contact:</p>
-        {qrCodeUrl && (
+        {qrCodeUrl ? (
           <Image
             src={qrCodeUrl}
-            alt="QR Code"
+            alt={`QR code to save ${contact.name}'s contact information`}
             width={200}
             height={200}
             className={styles.qrCode}
           />
+        ) : (
+          <p>Error generating QR code</p>
         )}
       </div>
 
-      {/* vCard Download Button */}
       <VCardGenerator contact={contact} />
     </div>
   );
