@@ -23,7 +23,7 @@ const BusinessCard = () => {
   };
 
   // URL for QR code (use deployed URL or localhost)
-  const cardUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://example.com";
+  const cardUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const [qrCodeUrl, setQrCodeUrl] = useState("");
 
   // Generate QR code
