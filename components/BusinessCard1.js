@@ -1,29 +1,24 @@
+// src/components/BusinessCard.js
 "use client";
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import QRCode from "qrcode";
-import VCardGenerator from "./VCardGenerator";
-import styles from "../app/card/styles.module.css";
+import VCardGenerator1 from "./VCardGenerator1";
+import styles from "../app/card1/styles.module.css";
 
-const BusinessCard = () => {
+const BusinessCard1 = () => {
   const contact = {
     name: "Edgar Lindo",
     title: "President",
     company: "Technical Union",
-    department: "Latin America", // Renamed from territory to clarify intent
+    territory: "Latin America",
     email: "info@tu.biz",
     phone: "+1 (586) 221-3095",
     whatsApp: "https://wa.me/15866125270",
     whatsAppNumber: "+1-586-612-5270",
     website: "https://www.tu.biz",
-    homeAddress: {
-      street: "",
-      locality: "Arlington Heights",
-      region: "IL",
-      postalCode: "60043",
-      country: "USA"
-    }
+    address: "Arlington Heights, IL 60043, USA",
   };
 
   const [qrCodeUrl, setQrCodeUrl] = useState("");
@@ -32,21 +27,20 @@ const BusinessCard = () => {
   const vCard = `BEGIN:VCARD
 VERSION:3.0
 FN:${contact.name}
-N:Lindo;Edgar;;;;
 TITLE:${contact.title}
-ORG:${contact.company};${contact.department}
-ADR;TYPE=HOME:;;${contact.homeAddress.street};${contact.homeAddress.locality};${contact.homeAddress.region};${contact.homeAddress.postalCode};${contact.homeAddress.country}
+ORG:${contact.company}
+ADR; TYPE=WORK:${contact.territory}
 EMAIL;TYPE=WORK:${contact.email}
 TEL;TYPE=WORK:${contact.phone}
 TEL;TYPE=CELL:${contact.whatsAppNumber}
 NOTE:WhatsApp:${contact.whatsAppNumber}
 URL:${contact.website}
-REV:${new Date().toISOString()}
+ADR;TYPE=HOME:;;${contact.address};;;;
 END:VCARD`;
 
   // Generate QR code with vCard data
   useEffect(() => {
-    QRCode.toDataURL(vCard, { width: 200, margin: 1, errorCorrectionLevel: "M" }, (err, url) => {
+    QRCode.toDataURL(vCard, { width: 200, margin: 1 }, (err, url) => {
       if (err) {
         console.error("QR Code generation error:", err);
         return;
@@ -71,7 +65,7 @@ END:VCARD`;
       <h1 className={styles.cardName}>{contact.name}</h1>
       <p className={styles.cardTitle}>{contact.title}</p>
       <p className={styles.cardCompany}>{contact.company}</p>
-      <p className={styles.cardCompany}>{contact.department}</p>
+      <p className={styles.cardCompany}>{contact.territory}</p>
 
       <div className={styles.cardDetails}>
         <p>
@@ -104,8 +98,7 @@ END:VCARD`;
           </a>
         </p>
         <p>
-          <span className={styles.detailLabel}>Address:</span>{" "}
-          {contact.homeAddress.locality}, {contact.homeAddress.region} {contact.homeAddress.postalCode}, {contact.homeAddress.country}
+          <span className={styles.detailLabel}>Address:</span> {contact.address}
         </p>
       </div>
 
@@ -124,9 +117,9 @@ END:VCARD`;
         )}
       </div>
 
-      <VCardGenerator contact={contact} />
+      <VCardGenerator1 contact={contact} />
     </div>
   );
 };
 
-export default BusinessCard;
+export default BusinessCard1;
