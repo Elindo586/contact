@@ -1,4 +1,3 @@
-// src/components/VCardGenerator.js
 "use client";
 
 import { saveAs } from "file-saver";
@@ -6,17 +5,16 @@ import styles from "../app/card/styles.module.css";
 
 const VCardGenerator = ({ contact }) => {
   const generateVCard = () => {
-   const vCard = `BEGIN:VCARD
+    const vCard = `BEGIN:VCARD
 VERSION:3.0
 FN:${contact.name}
 N:${contact.name.split(" ")[1]};${contact.name.split(" ")[0]};;;;
 TITLE:${contact.title}
 ORG:${contact.company};${contact.department}
-ADR;TYPE=HOME:;;${contact.homeAddress?.street || ""};${contact.homeAddress?.locality || "Arlington Heights"};${contact.homeAddress?.region || "IL"};${contact.homeAddress?.postalCode || "60043"};${contact.homeAddress?.country || "USA"}
+ADR;TYPE=HOME:;;${contact.homeAddress.street};${contact.homeAddress.locality};${contact.homeAddress.region};${contact.homeAddress.postalCode};${contact.homeAddress.country}
 EMAIL;TYPE=WORK:${contact.email}
 TEL;TYPE=WORK:${contact.phone}
-TEL;TYPE=CELL:${contact.whatsAppNumber}
-NOTE:WhatsApp:${contact.whatsAppNumber};WhatsApp Link:${contact.whatsApp}
+NOTE:WhatsApp:${contact.whatsAppNumber}
 URL:${contact.website}
 REV:${new Date().toISOString()}
 END:VCARD`;

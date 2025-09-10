@@ -84,9 +84,9 @@
 
 .qrCode {
   display: block;
-  margin: 0 auto;
-  width: 200px;
-  height: 200px;
+   max-width: 100%;
+  height: auto;
+  transition: none;
 }
 
 .vcardButton {

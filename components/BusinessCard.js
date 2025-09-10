@@ -11,9 +11,9 @@ const BusinessCard = () => {
     name: "Edgar Lindo",
     title: "President",
     company: "Technical Union",
-    department: "Latin America", // Renamed from territory to clarify intent
+    department: "Latin America", // Renamed from territory
     email: "info@tu.biz",
-    phone: "+1 (586) 221-3095",
+    phone: "+1-586-221-3095",
     whatsApp: "https://wa.me/15866125270",
     whatsAppNumber: "+1-586-612-5270",
     website: "https://www.tu.biz",
@@ -21,24 +21,24 @@ const BusinessCard = () => {
       street: "",
       locality: "Arlington Heights",
       region: "IL",
-      postalCode: "60043",
+      postalCode: "60004",
       country: "USA"
     }
   };
 
   const [qrCodeUrl, setQrCodeUrl] = useState("");
+  const [qrError, setQrError] = useState(null);
 
   // Generate vCard string for QR code
   const vCard = `BEGIN:VCARD
 VERSION:3.0
 FN:${contact.name}
-N:Lindo;Edgar;;;;
+N:${contact.name.split(" ")[1]};${contact.name.split(" ")[0]};;;;
 TITLE:${contact.title}
 ORG:${contact.company};${contact.department}
 ADR;TYPE=HOME:;;${contact.homeAddress.street};${contact.homeAddress.locality};${contact.homeAddress.region};${contact.homeAddress.postalCode};${contact.homeAddress.country}
 EMAIL;TYPE=WORK:${contact.email}
 TEL;TYPE=WORK:${contact.phone}
-TEL;TYPE=CELL:${contact.whatsAppNumber}
 NOTE:WhatsApp:${contact.whatsAppNumber}
 URL:${contact.website}
 REV:${new Date().toISOString()}
@@ -46,14 +46,20 @@ END:VCARD`;
 
   // Generate QR code with vCard data
   useEffect(() => {
-    QRCode.toDataURL(vCard, { width: 200, margin: 1, errorCorrectionLevel: "M" }, (err, url) => {
+    setQrError(null); // Reset error state
+    QRCode.toDataURL(vCard, {
+      width: 300, // Larger size for readability
+      margin: 2, // Increased margin for scanner compatibility
+      errorCorrectionLevel: "H" // High error correction
+    }, (err, url) => {
       if (err) {
         console.error("QR Code generation error:", err);
+        setQrError("Failed to generate QR code");
         return;
       }
       setQrCodeUrl(url);
     });
-  }, [vCard]);
+  }, []); // Empty dependency array to prevent re-renders
 
   return (
     <div className={styles.cardContainer}>
@@ -111,16 +117,17 @@ END:VCARD`;
 
       <div className={styles.qrCodeContainer}>
         <p className={styles.qrCodeLabel}>Scan to save contact:</p>
-        {qrCodeUrl ? (
+        {qrCodeUrl && !qrError ? (
           <Image
             src={qrCodeUrl}
             alt={`QR code to save ${contact.name}'s contact information`}
-            width={200}
-            height={200}
+            width={300}
+            height={300}
             className={styles.qrCode}
+            unoptimized // Prevent Next.js optimization issues
           />
         ) : (
-          <p>Error generating QR code</p>
+          <p>{qrError || "Generating QR code..."}</p>
         )}
       </div>
 
