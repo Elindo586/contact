@@ -15,7 +15,8 @@ EMAIL;TYPE=WORK:${contact.email}
 TEL;TYPE=WORK:${contact.phone}
 NOTE:WhatsApp:${contact.whatsAppNumber}
 URL:${contact.website}
-ADR;TYPE=WORK:;;${contact.address};;;;
+ADR;TYPE=WORK:${contact.territory}
+ADR;TYPE=HOME:;;${contact.address};;;;
 END:VCARD`;
 
     const blob = new Blob([vCard], { type: "text/vcard;charset=utf-8" });

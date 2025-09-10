@@ -7,7 +7,7 @@ export async function GET(request) {
     const sql = neon(process.env.DATABASE_URL);
 
     // Execute the DROP TABLE query
-    const result = await sql`DROP TABLE IF EXISTS webhook;`;
+    // const result = await sql`DROP TABLE IF EXISTS nothing;`;
 
     // Send a response confirming the table was dropped
     return NextResponse.json({ message: "Table dropped successfully", result }, { status: 200 });

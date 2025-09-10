@@ -10,14 +10,15 @@ import styles from "../app/card/styles.module.css";
 const BusinessCard = () => {
   const contact = {
     name: "Edgar Lindo",
-    title: "Sales Engineer",
+    title: "President",
     company: "Technical Union",
+    territory: "Latin America",
     email: "info@tu.biz",
     phone: "+1 (586) 221-3095",
     whatsApp: "https://wa.me/15866125270",
     whatsAppNumber: "+1-586-612-5270",
     website: "https://www.tu.biz",
-    address: "Arlington Heights, IL 60043",
+    address: "Arlington Heights, IL 60043, USA",
   };
 
   const [qrCodeUrl, setQrCodeUrl] = useState("");
@@ -28,12 +29,13 @@ VERSION:3.0
 FN:${contact.name}
 TITLE:${contact.title}
 ORG:${contact.company}
+ADR; TYPE=WORK:${contact.territory}
 EMAIL;TYPE=WORK:${contact.email}
 TEL;TYPE=WORK:${contact.phone}
 TEL;TYPE=CELL:${contact.whatsAppNumber}
 NOTE:WhatsApp:${contact.whatsAppNumber}
 URL:${contact.website}
-ADR;TYPE=WORK:;;${contact.address};;;;
+ADR;TYPE=HOME:;;${contact.address};;;;
 END:VCARD`;
 
   // Generate QR code with vCard data
@@ -63,6 +65,7 @@ END:VCARD`;
       <h1 className={styles.cardName}>{contact.name}</h1>
       <p className={styles.cardTitle}>{contact.title}</p>
       <p className={styles.cardCompany}>{contact.company}</p>
+      <p className={styles.cardCompany}>{contact.territory}</p>
 
       <div className={styles.cardDetails}>
         <p>
