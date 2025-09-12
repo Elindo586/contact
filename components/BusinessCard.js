@@ -11,7 +11,7 @@ const BusinessCard = () => {
     name: "Edgar Lindo",
     title: "President",
     company: "Technical Union",
-    department: "Latin America", // Renamed from territory
+    department: "Sales Rep. LATAM", // Renamed from territory
     email: "info@tu.biz",
     phone: "+1-586-221-3095",
     whatsApp: "https://wa.me/15866125270",
@@ -40,7 +40,8 @@ ADR;TYPE=HOME:;;${contact.homeAddress.street};${contact.homeAddress.locality};${
 EMAIL;TYPE=WORK:${contact.email}
 TEL;TYPE=WORK:${contact.phone}
 NOTE:WhatsApp:${contact.whatsAppNumber}
-URL:${contact.website}
+URL;TYPE=WORK:${contact.website}
+URL;TYPE=WHATSAPP:${contact.whatsApp}
 REV:${new Date().toISOString()}
 END:VCARD`;
 

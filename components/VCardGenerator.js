@@ -15,7 +15,8 @@ ADR;TYPE=HOME:;;${contact.homeAddress.street};${contact.homeAddress.locality};${
 EMAIL;TYPE=WORK:${contact.email}
 TEL;TYPE=WORK:${contact.phone}
 NOTE:WhatsApp:${contact.whatsAppNumber}
-URL:${contact.website}
+URL;TYPE=WORK:${contact.website}
+URL,TYPE=WHATSAPP:${contact.whatApp}
 REV:${new Date().toISOString()}
 END:VCARD`;
 

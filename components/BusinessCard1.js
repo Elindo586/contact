@@ -11,7 +11,7 @@ const BusinessCard1 = () => {
     name: "Edgar Lindo",
     title: "President",
     company: "Technical Union",
-    department: "Latin America",
+    department: "Sales Rep. LATAM",
     email: "info@tu.biz",
     phone: "+1-586-221-3095",
     whatsApp: "https://wa.me/15866125270",
