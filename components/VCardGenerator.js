@@ -16,7 +16,7 @@ EMAIL;TYPE=WORK:${contact.email}
 TEL;TYPE=WORK:${contact.phone}
 NOTE:WhatsApp:${contact.whatsAppNumber}
 URL;TYPE=WORK:${contact.website}
-URL,TYPE=WHATSAPP:${contact.whatApp}
+URL;TYPE=WHATSAPP:${contact.whatApp}
 REV:${new Date().toISOString()}
 END:VCARD`;
 
