@@ -57,6 +57,7 @@ export async function POST(req) {
     const msg = {
       to: "info@tu.biz", // Set to specified recipient
       from: "edgar@teams.tu.biz", // Verified sender
+      replyTo: from,
       subject: subject,
       custom_args: {"teams": "teams.tu.biz"}, // Kept as custom_args
       text: `From: ${from}\n\nText: ${text}\n\nHTML: ${html}`, // Include from, text, and html
