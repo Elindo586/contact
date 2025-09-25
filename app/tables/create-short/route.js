@@ -7,7 +7,7 @@ export async function GET(request) {
   try {
     // Corrected SQL statement (removed trailing comma)
     const result = await sql`
-      CREATE TABLE unsub (
+      CREATE TABLE productsfor (
         email TEXT,
         date TEXT
       );
