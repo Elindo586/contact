@@ -1,5 +1,6 @@
 import { neon } from "@neondatabase/serverless";
 import { NextResponse } from "next/server";
+import sgMail from '@sendgrid/mail';
 
 export async function POST(req) {
 
@@ -42,6 +43,29 @@ export async function POST(req) {
         ${chicagoTime}
       );
     `;
+
+    sgMail(process.env.SENDGRID_API_KEY);
+
+    const msg = {
+      to: "info@tu.biz", // Change to your recipient
+      from: "edgar@teams.tu.biz", // Change to your verified sender
+      subject: subject,
+      custom_args: {"teams": "teams.tu.biz"},
+      text: from, text, html
+      html: html,
+     
+    };
+
+    sgMail
+      .send(msg)
+      .then(() => {
+        console.log("Email sent");
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+
+
 
     console.log("✅ Email inserted:", result);
     console.log("hello");
