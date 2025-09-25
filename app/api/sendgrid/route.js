@@ -60,8 +60,8 @@ export async function POST(req) {
       replyTo: from,
       subject: subject,
       custom_args: {"teams": "teams.tu.biz"}, // Kept as custom_args
-      text: `From: ${from}\n\nText: ${text}\n\nHTML: ${html}`, // Include from, text, and html
-      // html: html,
+      text: `From: ${from}\n\nText: ${text}`, // Include from, text, and html
+      html: `From: ${from} \n\n ${html}`,
     };
 
     // Send email
