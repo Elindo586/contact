@@ -2,9 +2,10 @@ import { neon } from "@neondatabase/serverless";
 import { NextResponse } from "next/server";
 import sgMail from '@sendgrid/mail';
 
-export async function POST(req) {
+// Set SendGrid API key once at module level
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-  console.log("hi");
+export async function POST(req) {
   try {
     const formData = await req.formData();
     const from = formData.get("from");
@@ -13,8 +14,15 @@ export async function POST(req) {
     const text = formData.get("text");
     const html = formData.get("html");
 
+    // Validate input fields
     if (typeof from !== "string" || from.trim() === "") {
-      throw new Error("The 'from' field is required and must be a string.");
+      throw new Error("The 'from' field is required and must be a non-empty string.");
+    }
+    if (typeof to !== "string" || to.trim() === "") {
+      throw new Error("The 'to' field is required and must be a non-empty string.");
+    }
+    if (typeof subject !== "string" || subject.trim() === "") {
+      throw new Error("The 'subject' field is required and must be a non-empty string.");
     }
 
     const now = new Date();
@@ -25,7 +33,8 @@ export async function POST(req) {
 
     const sql = neon(process.env.DATABASE_URL);
 
-    const result = await sql`
+    // Insert email data into database
+    await sql`
       INSERT INTO edgar_teams (
         from_email,
         to_email,
@@ -44,34 +53,22 @@ export async function POST(req) {
       );
     `;
 
-    sgMail(process.env.SENDGRID_API_KEY);
-
+    // Configure email message
     const msg = {
-      to: "info@tu.biz", // Change to your recipient
-      from: "edgar@teams.tu.biz", // Change to your verified sender
+      to: "info@tu.biz", // Set to specified recipient
+      from: "edgar@teams.tu.biz", // Verified sender
       subject: subject,
-      custom_args: {"teams": "teams.tu.biz"},
-      text: from, text, html
+      custom_args: {"teams": "teams.tu.biz"}, // Kept as custom_args
+      text: `From: ${from}\n\nText: ${text}\n\nHTML: ${html}`, // Include from, text, and html
       html: html,
-     
     };
 
-    sgMail
-      .send(msg)
-      .then(() => {
-        console.log("Email sent");
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-
-
-
-    console.log("✅ Email inserted:", result);
-    console.log("hello");
+    // Send email
+    await sgMail.send(msg);
+    console.log("Email sent successfully");
 
     return NextResponse.json(
-      { message: `Email received from ${from} to ${to}` },
+      { message: `Email received and sent from ${from} to ${to}` },
       { status: 200 }
     );
   } catch (error) {
@@ -79,4 +76,3 @@ export async function POST(req) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
-
