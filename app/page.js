@@ -4,7 +4,7 @@ export default function Home() {
       <p>You found this empty page!</p> <br />
       <p>
         {" "}
-        Go to <a href="https://www.tu.biz">main site</a>.
+        Go to <a href="https://www.tu.biz">main site.</a>.
       </p>
     </div>
   );
