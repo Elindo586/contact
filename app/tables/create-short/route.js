@@ -7,9 +7,13 @@ export async function GET(request) {
   try {
     // Corrected SQL statement (removed trailing comma)
     const result = await sql`
-      CREATE TABLE productsfor (
-        email TEXT,
-        date TEXT
+      CREATE TABLE team05 (
+        from_email TEXT,
+        to_email TEXT,
+        subject varchar(255),
+        text_body TEXT,
+        html_body TEXT,
+        timestamp varchar(255)
       );
     `;
 

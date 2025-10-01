@@ -2,10 +2,10 @@ import { neon } from "@neondatabase/serverless";
 import { NextResponse } from "next/server";
 
 export async function GET(request, { params }) {
-    const { email: userEmail } = params;
+    const { email } = await params;
 
     // Validate email parameter
-    if (!userEmail || typeof userEmail !== "string") {
+    if (!email || typeof email !== "string") {
         return NextResponse.json({ error: "Invalid email parameter" }, { status: 400 });
     }
 
@@ -13,29 +13,27 @@ export async function GET(request, { params }) {
     const sql = neon(`${process.env.DATABASE_URL}`);
     console.log("Connecting to database with URL:", process.env.DATABASE_URL);
 
-    // Get Chicago time in a database-friendly format
+    // Get Chicago time in 12-hour format with AM/PM
     const d = new Date();
-    const chicagoTime = d
-        .toLocaleString("en-US", {
-            timeZone: "America/Chicago",
-            hour12: false,
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-        })
-        .replace(/(\d+)\/(\d+)\/(\d+),/, "$3-$1-$2"); // Convert to YYYY-MM-DD HH:MM:SS
+    const chicagoTime = d.toLocaleString("en-US", {
+        timeZone: "America/Chicago",
+        hour12: true, // Enable 12-hour format with AM/PM
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+    });
 
-    console.log("Chicago time:", chicagoTime);
-    console.log("Inserting data into database:", { userEmail, chicagoTime });
+    console.log("Chicago time:", chicagoTime); // e.g., "09/25/2025, 01:15:00 PM"
+    console.log("Inserting data into database:", { email, chicagoTime });
 
     try {
         // Insert into the database
         const result = await sql`
             INSERT INTO productsfor (email, date)
-            VALUES (${userEmail}, ${chicagoTime})
+            VALUES (${email}, ${chicagoTime})
             RETURNING *;
         `;
         console.log("Data inserted successfully:", result);
