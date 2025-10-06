@@ -47,54 +47,6 @@ const d = new Date();
 		case "tubiz":
 			redirectUrl.href = "https://www.tu.biz"
 			break;
-		case "fluidyne":
-			redirectUrl.href = "https://www.fluidynefp.com/Literature.aspx";
-			break;
-		case "a4v":
-			redirectUrl.href = "https://www.fluidynefp.com/LiteratureDoc.ashx?Id=39";
-			break;
-		case "vq-pump":
-			redirectUrl.href = "https://www.tu.biz/products/vane-pumps";
-			break;
-		case "charlynn":
-			redirectUrl.href = "https://www.tu.biz/products/geroler-motors";
-			break;
-		case "heatExchanger-hybrid":
-		case "water-cooler":
-			redirectUrl.href =
-				"https://universalhydraulik-usa.com/products-solutions/heat-exchanger/shell-and-tube-heat-exchanger/hybrid-heat-exchanger/";
-			break;
-		case "heatExchanger-air":
-		case "air-coolers":
-			redirectUrl.href =
-				"https://universalhydraulik.com/products-solutions/heat-exchanger/oil-air-cooler/oil-air-heat-exchanger-series/";
-			break;
-		case "won-linear":
-			redirectUrl.href = "http://wonst.co.kr/english/product/product_main.php";
-			break;
-		case "linearguides":
-		case "linearguides-english":
-			redirectUrl.href =
-				"https://www.tu.biz/products/mechanical/linear-bearings";
-			break;
-		case "iis-applications":
-			redirectUrl.href = "https://www.iis-servo.com/industries/";
-			break;
-		case "iis-products":
-			redirectUrl.href = "https://www.iis-servo.com/products/";
-			break;
-		case "controller":
-			redirectUrl.href =
-				"https://www.iis-servo.com/products/emerald-automation-controller/";
-			break;
-		case "toshiba":
-			redirectUrl.href =
-				"https://www.iis-servo.com/products/shibaura-machine-products/";
-			break;
-		case "luminary":
-			redirectUrl.href =
-				"https://www.iis-servo.com/products/luminary-motion-controller/";
-			break;
         case "emerald-controller":
         case "emerald-drive":
         case "luminary-controller":
