@@ -7,8 +7,10 @@ export async function GET(request) {
   try {
     // Corrected SQL statement (removed trailing comma)
     const result = await sql`
-      CREATE TABLE links (
-        product TEXT,
+      CREATE TABLE gclids (
+        gclid TEXT,
+        linkId TEXT,
+        Ip TEXT,
         date TEXT
       );
     `;
