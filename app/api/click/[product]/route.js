@@ -54,7 +54,7 @@ const d = new Date();
         case "brushless-motors":
         case "toshiba-motors":
 			redirectUrl.href =
-				"https://www.iis-servo.com/contact-us?utm_source=technical-union-tubiz&utm_medium=referral";
+				"https://www.tu.biz/contact-us?utm_source=technical-union-tubiz&utm_medium=referral";
 			break;
 
 		default:
