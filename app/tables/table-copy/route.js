@@ -6,7 +6,7 @@ export async function GET(request) {
   const sql = neon(`${process.env.DATABASE_URL}`);
   try {
    const result = 
-    await sql`SELECT * FROM webhook`;
+    await sql`SELECT * FROM unsub`;
 // await sql `SELECT row_to_json(product)
 // FROM product`;
 // await sql `SELECT json_agg(row_to_json(product))
