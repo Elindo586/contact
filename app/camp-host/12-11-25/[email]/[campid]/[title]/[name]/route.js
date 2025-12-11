@@ -8,6 +8,7 @@ export async function GET(_, { params }) {
   const email = params.email;
   const campId = params.campid;
   const title = params.title;
+  const name = params.name;
 
   const d = new Date();
   const month = d.getMonth() + 1;
@@ -96,7 +97,7 @@ export async function GET(_, { params }) {
 					<p style="margin-bottom: 0.2em; margin-top: 0.1em">
 						If you can't see images,
 						<a
-							href="https://email.tu.biz/ehost/ehost1/${email}/${campId}/${title}"
+							href="https://contact.tu.biz/camp-host/12-11-25/${email}/${campId}/${title}"
 							>click here</a
 						>
 						to view it on the web.
@@ -175,7 +176,7 @@ export async function GET(_, { params }) {
 						</tr>
 						<tr>
 							<td colspan="5">
-								<p>Hello Somebody,</p>
+								<p>Hello ${name},</p>
 								<p>Wishing you a Merry Christmas and Happy New Year!</p>
 							</td>
 						</tr>
@@ -456,8 +457,6 @@ export async function GET(_, { params }) {
 		</table>
 	</body>
 </html>
-
-
 
   `;
 
