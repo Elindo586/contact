@@ -2,6 +2,7 @@ import { neon } from "@neondatabase/serverless";
 import { NextResponse } from "next/server";
 import sgMail from "@sendgrid/mail";
 
+console.log (process.env.SENDGRID_API_KEY);
 // Set SendGrid API key once at module level
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
