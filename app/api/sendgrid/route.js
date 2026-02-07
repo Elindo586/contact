@@ -2,7 +2,7 @@ import { neon } from "@neondatabase/serverless";
 import { NextResponse } from "next/server";
 import sgMail from "@sendgrid/mail";
 
-console.log (process.env.SENDGRID_API_KEY);
+console.log(process.env.SENDGRID_API_KEY);
 // Set SendGrid API key once at module level
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
@@ -22,7 +22,7 @@ export async function POST(req) {
 			text = formData.get("text");
 			html = formData.get("html");
 		}
-		console.log (from);
+		console.log(from);
 
 		// Validate input fields
 		if (typeof from !== "string" || from.trim() === "") {
@@ -68,7 +68,10 @@ export async function POST(req) {
 			subject: subject,
 			custom_args: { teams: "teams.tu.biz" }, // Kept as custom_args
 			text: `From: ${from}\n\nText: ${text}`, // Include from, text, and html
-			html: `From: ${from} \n\n ${html}`,
+			html: `<p><strong>From:</strong> ${from}</p>
+    <p><strong>Subject:</strong> ${subject}</p>
+    <p><strong>Message:</strong></p>
+    ${html || text?.replace(/\n/g, "<br>") || ""}`,
 		};
 
 		// Send email
