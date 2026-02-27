@@ -7,11 +7,9 @@ export async function GET(request) {
 	try {
 		// Corrected SQL statement (removed trailing comma)
 		const result = await sql`
-      CREATE TABLE gclidsForm (
+      CREATE TABLE gclidsClicks (
         gclid TEXT,
         name TEXT,
-        lastName TEXT,
-        email TEXT,
         linkId TEXT,
         Ip TEXT,
         date TEXT
