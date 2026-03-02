@@ -9,9 +9,10 @@ import styles from "../app/card/styles.module.css";
 const BusinessCard = () => {
   const contact = {
     name: "Edgar Lindo",
-    title: "President",
-    company: "Technical Union",
-    department: "Sales Rep. LATAM", // Renamed from territory
+    title: "Independent Sales Rep.",
+    companyMain: "Technical Union",
+    companySpecialties: "Hydraulics | Pneumatics | Electrical | Mechanical",
+    department: "Latin America",
     email: "info@tu.biz",
     phone: "+1-586-221-3095",
     whatsApp: "https://wa.me/15866125270",
@@ -29,29 +30,29 @@ const BusinessCard = () => {
   const [qrCodeUrl, setQrCodeUrl] = useState("");
   const [qrError, setQrError] = useState(null);
 
-  // Generate vCard string for QR code
+  const clean = (str) => String(str || "").replace(/[,;]/g, '\\$&').trim();
+
   const vCard = `BEGIN:VCARD
 VERSION:3.0
-FN:${contact.name}
-N:${contact.name.split(" ")[1]};${contact.name.split(" ")[0]};;;;
-TITLE:${contact.title}
-ORG:${contact.company};${contact.department}
-ADR;TYPE=HOME:;;${contact.homeAddress.street};${contact.homeAddress.locality};${contact.homeAddress.region};${contact.homeAddress.postalCode};${contact.homeAddress.country}
-EMAIL;TYPE=WORK:${contact.email}
-TEL;TYPE=WORK:${contact.phone}
-NOTE:WhatsApp:${contact.whatsAppNumber}
-URL;TYPE=WORK:${contact.website}
-URL;TYPE=WHATSAPP:${contact.whatsApp}
+FN:${clean(contact.name)}
+N:${clean(contact.name.split(" ")[1])};${clean(contact.name.split(" ")[0])};;;
+TITLE:${clean(contact.title)}
+ORG:${clean(contact.companyMain)};${clean(contact.companySpecialties)};${clean(contact.department)}
+ADR;TYPE=HOME:;;${clean(contact.homeAddress.street)};${clean(contact.homeAddress.locality)};${clean(contact.homeAddress.region)};${clean(contact.homeAddress.postalCode)};${clean(contact.homeAddress.country)}
+EMAIL;TYPE=WORK:${clean(contact.email)}
+TEL;TYPE=WORK:${clean(contact.phone)}
+NOTE:WhatsApp: ${clean(contact.whatsAppNumber)}
+URL;TYPE=WORK:${clean(contact.website)}
+URL;TYPE=WHATSAPP:${clean(contact.whatsApp)}
 REV:${new Date().toISOString()}
 END:VCARD`;
 
-  // Generate QR code with vCard data
   useEffect(() => {
-    setQrError(null); // Reset error state
+    setQrError(null);
     QRCode.toDataURL(vCard, {
-      width: 300, // Larger size for readability
-      margin: 2, // Increased margin for scanner compatibility
-      errorCorrectionLevel: "H" // High error correction
+      width: 300,
+      margin: 2,
+      errorCorrectionLevel: "H"
     }, (err, url) => {
       if (err) {
         console.error("QR Code generation error:", err);
@@ -60,7 +61,7 @@ END:VCARD`;
       }
       setQrCodeUrl(url);
     });
-  }, []); // Empty dependency array to prevent re-renders
+  }, []);
 
   return (
     <div className={styles.cardContainer}>
@@ -77,8 +78,12 @@ END:VCARD`;
 
       <h1 className={styles.cardName}>{contact.name}</h1>
       <p className={styles.cardTitle}>{contact.title}</p>
-      <p className={styles.cardCompany}>{contact.company}</p>
-      <p className={styles.cardCompany}>{contact.department}</p>
+      
+      {/* Changed: two separate lines */}
+      <p className={styles.cardCompany}>{contact.companyMain}</p>
+      <p className={styles.cardSpecialties}>{contact.companySpecialties}</p>
+      
+      <p className={styles.cardDepartment}>{contact.department}</p>
 
       <div className={styles.cardDetails}>
         <p>
@@ -125,7 +130,7 @@ END:VCARD`;
             width={300}
             height={300}
             className={styles.qrCode}
-            unoptimized // Prevent Next.js optimization issues
+            unoptimized
           />
         ) : (
           <p>{qrError || "Generating QR code..."}</p>
