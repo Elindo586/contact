@@ -11,7 +11,7 @@ const BusinessCardFluidyne = () => {
     name: "Edgar Lindo",
     title: "Sales Engineer",
     company: "Fluidyne Fluid Power",
-    department: "LATAM", // Renamed from territory
+    department: "Latin America", // Renamed from territory
     email: "edgar@fluidynefp.com",
     phone: "+1-586-221-3095",
     whatsApp: "https://wa.me/15866125270",
