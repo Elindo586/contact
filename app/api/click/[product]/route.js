@@ -1,64 +1,50 @@
-// import { sql } from "@vercel/postgres";
-import { neon } from "@neondatabase/serverless";
 import { NextResponse } from "next/server";
+import { getTrackingSql } from "../../../../lib/neon-tracking.js";
 
 export async function GET(request, { params }) {
 	const { product } = await params;
 
-	const sql = neon(`${process.env.DATABASE_URL}`);
+	const sql = getTrackingSql();
 
-const d = new Date();
-    const chicagoTime = d.toLocaleString("en-US", {
-        timeZone: "America/Chicago",
-        hour12: true, // Enable 12-hour format with AM/PM
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-    });
+	if (sql) {
+		const d = new Date();
+		const chicagoTime = d.toLocaleString("en-US", {
+			timeZone: "America/Chicago",
+			hour12: true,
+			year: "numeric",
+			month: "2-digit",
+			day: "2-digit",
+			hour: "2-digit",
+			minute: "2-digit",
+			second: "2-digit",
+		});
 
-	// Debug: Log parameters to check if data is correct
-	console.log("Inserting data into database:", {
-		product,
-		chicagoTime,
-	});
-
-	try {
-		// Insert into the database
-		const result = await sql`
-      INSERT INTO links (product, date)
-      VALUES (${product}, ${chicagoTime});
-    `;
-		console.log("Data inserted successfully:", result);
-	} catch (error) {
-		console.error("Error inserting data:", error);
-		return NextResponse.error(); // Optional: Return error response if insertion fails
+		try {
+			await sql`
+        INSERT INTO links (product, date)
+        VALUES (${product}, ${chicagoTime});
+      `;
+		} catch (error) {
+			console.error("Error inserting click tracking:", error);
+		}
 	}
 
-	// Define the redirect URL based on the product
 	const redirectUrl = new URL("https://tu.biz", request.url);
-
-	// the link is:
-	// https://email.tu.biz/my/email-follow/g/g/g
 
 	switch (product) {
 		case "tubiz":
-			redirectUrl.href = "https://www.tu.biz"
+			redirectUrl.href = "https://www.tu.biz";
 			break;
-        case "emerald-controller":
-        case "emerald-drive":
-        case "luminary-controller":
-        case "luminary-drive":
-        case "brushless-motors":
-        case "toshiba-motors":
+		case "emerald-controller":
+		case "emerald-drive":
+		case "luminary-controller":
+		case "luminary-drive":
+		case "brushless-motors":
+		case "toshiba-motors":
 			redirectUrl.href =
 				"https://www.iis-servo.com/contact-us?utm_source=technical-union-tubiz&utm_medium=referral";
 			break;
-
 		default:
-			// Handle unknown products with a default redirect
 			redirectUrl.href = "https://www.tu.biz";
 			break;
 	}

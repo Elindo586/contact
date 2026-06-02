@@ -1,26 +1,28 @@
-// import { sql } from "@vercel/postgres";
-import { neon } from "@neondatabase/serverless";
 import { NextResponse } from "next/server";
+import { getTrackingSql } from "../../../../../../../lib/neon-tracking.js";
 
 export async function GET(_, { params }) {
-
-  const sql = neon(`${process.env.DATABASE_URL}`);
   const email = params.email;
   const campId = params.campid;
   const title = params.title;
   const name = params.name;
 
-  const d = new Date();
-  const month = d.getMonth() + 1;
-  const days = d.getDate();
-  const year = d.getFullYear();
-  const hour = d.getHours();
-  const minutes = d.getMinutes();
-  const seconds = d.getSeconds();
-
-  const date = ` ${year}/${month}/${days} at ${hour}:${minutes}:${seconds}s`;
-
-  await sql`INSERT INTO host1 (email, campId, date) VALUES ( ${email}, ${campId}, ${date});`;
+  const sql = getTrackingSql();
+  if (sql) {
+    const d = new Date();
+    const month = d.getMonth() + 1;
+    const days = d.getDate();
+    const year = d.getFullYear();
+    const hour = d.getHours();
+    const minutes = d.getMinutes();
+    const seconds = d.getSeconds();
+    const date = ` ${year}/${month}/${days} at ${hour}:${minutes}:${seconds}s`;
+    try {
+      await sql`INSERT INTO host1 (email, campId, date) VALUES ( ${email}, ${campId}, ${date});`;
+    } catch (error) {
+      console.error("Error inserting camp-host tracking:", error);
+    }
+  }
 
   const htmlResponse = `<!DOCTYPE html>
 <html>

@@ -1,8 +1,8 @@
 'use strict';
 
-import { neon } from '@neondatabase/serverless';
 import { NextResponse } from 'next/server';
 import { Ecdsa, Signature, PublicKey } from 'starkbank-ecdsa';
+import { getTrackingSql, isNeonTrackingEnabled } from '../../../lib/neon-tracking.js';
 
 /*
   App Router notes:
@@ -14,7 +14,6 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const SENDGRID_SECRET = process.env.SENDGRID_SECRET?.replace(/\\n/g, '\n');
-const sql = neon(process.env.DATABASE_URL);
 
 if (!SENDGRID_SECRET) {
   throw new Error('Missing SENDGRID_SECRET env variable');
@@ -99,6 +98,17 @@ export async function POST(req) {
         { status: 200 }
       );
     }
+
+    if (!isNeonTrackingEnabled()) {
+      return NextResponse.json({
+        message: 'Webhook accepted (Neon tracking disabled)',
+        tracking: false,
+        eventCount: events.length,
+        successfulInserts: 0,
+      });
+    }
+
+    const sql = getTrackingSql();
 
     /* ---------------- DB insert ---------------- */
 
