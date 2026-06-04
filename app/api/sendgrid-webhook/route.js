@@ -2,7 +2,6 @@
 
 import { NextResponse } from 'next/server';
 import { Ecdsa, Signature, PublicKey } from 'starkbank-ecdsa';
-import { getTrackingSql, isNeonTrackingEnabled } from '../../../lib/neon-tracking.js';
 
 /*
   App Router notes:
@@ -52,10 +51,8 @@ export async function POST(req) {
       );
     }
 
-    /* raw body required for SendGrid verification */
     const rawBody = await req.text();
 
-    /* ---- timestamp validation (5 min window) ---- */
     const now = Math.floor(Date.now() / 1000);
     const ts = Number(timestampHeader);
 
@@ -66,7 +63,6 @@ export async function POST(req) {
       );
     }
 
-    /* ---- signature verification ---- */
     const isValid = verifySignature(
       SENDGRID_SECRET,
       rawBody,
@@ -81,7 +77,6 @@ export async function POST(req) {
       );
     }
 
-    /* ---- parse JSON AFTER verification ---- */
     let events;
     try {
       events = JSON.parse(rawBody);
@@ -99,111 +94,11 @@ export async function POST(req) {
       );
     }
 
-    if (!isNeonTrackingEnabled()) {
-      return NextResponse.json({
-        message: 'Webhook accepted (Neon tracking disabled)',
-        tracking: false,
-        eventCount: events.length,
-        successfulInserts: 0,
-      });
-    }
-
-    const sql = getTrackingSql();
-
-    /* ---------------- DB insert ---------------- */
-
-    let successfulInserts = 0;
-    const errors = [];
-
-    for (const e of events) {
-      const {
-        teams,
-        email,
-        event: eventType,
-        timestamp: eventTimestamp, // avoid shadowing
-        smtp_id,
-        useragent,
-        ip,
-        sg_event_id,
-        sg_message_id,
-        reason,
-        status,
-        response,
-        tls,
-        url,
-        category,
-        asm_group_id,
-        marketing_campaign_id,
-        marketing_campaign_name,
-        attempt,
-        pool,
-        sg_machine_open,
-        bounce_classification,
-        type,
-      } = e;
-
-      /* required fields */
-      if (!email || !eventType || !sg_event_id || !sg_message_id) {
-        errors.push(`Missing fields for ${sg_event_id}`);
-        continue;
-      }
-
-      /* your business filter */
-      if (teams !== 'teams.tu.biz') continue;
-
-      const chicagoTime = new Date().toLocaleString('en-US', {
-        timeZone: 'America/Chicago',
-        hour12: true,
-      });
-
-      try {
-        await sql`
-          INSERT INTO webhook (
-            teams,email,event,chicago_time,timestamp,smtp_id,useragent,ip,
-            sg_event_id,sg_message_id,reason,status,response,tls,url,category,
-            asm_group_id,marketing_campaign_id,marketing_campaign_name,
-            attempt,pool,sg_machine_open,bounce_classification,type
-          )
-          VALUES (
-            ${teams},
-            ${email},
-            ${eventType},
-            ${chicagoTime},
-            ${eventTimestamp},
-            ${smtp_id || null},
-            ${useragent || null},
-            ${ip || null},
-            ${sg_event_id},
-            ${sg_message_id},
-            ${reason || null},
-            ${status || null},
-            ${response || null},
-            ${tls || null},
-            ${url || null},
-            ${Array.isArray(category) ? category : category ? [category] : null},
-            ${asm_group_id || null},
-            ${marketing_campaign_id || null},
-            ${marketing_campaign_name || null},
-            ${attempt || null},
-            ${pool || null},
-            ${sg_machine_open || null},
-            ${bounce_classification || null},
-            ${type || null}
-          )
-        `;
-
-        successfulInserts++;
-      } catch (err) {
-        if (err.code === '23505') continue; // duplicate safe
-        errors.push(err.message);
-      }
-    }
-
     return NextResponse.json({
-      message: 'Webhook processed',
-      successfulInserts,
+      message: 'Webhook accepted (Neon tracking suspended)',
+      tracking: false,
       eventCount: events.length,
-      errors: errors.length ? errors : undefined,
+      successfulInserts: 0,
     });
   } catch (err) {
     console.error(err);
