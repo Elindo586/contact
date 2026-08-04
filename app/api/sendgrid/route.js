@@ -1,8 +1,26 @@
 import { NextResponse } from "next/server";
 import sgMail from "@sendgrid/mail";
-import blockedEmails from "./blocked-emails.json";
+import blockedEmailsJson from "./blocked-emails.json";
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+/** Pull a bare address from "Name <email@x.com>" or a plain email string. */
+function extractEmail(value) {
+  const raw = String(value).trim();
+  const angle = raw.match(/<([^>]+)>/);
+  const candidate = (angle ? angle[1] : raw).trim().toLowerCase();
+  const match = candidate.match(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i);
+  return match ? match[0].toLowerCase() : candidate;
+}
+
+const blockedEmails = new Set(
+  (Array.isArray(blockedEmailsJson)
+    ? blockedEmailsJson
+    : blockedEmailsJson?.default || []
+  )
+    .map((email) => extractEmail(email))
+    .filter(Boolean),
+);
 
 export async function POST(req) {
   try {
@@ -37,8 +55,9 @@ export async function POST(req) {
       );
     }
 
-    const fromNormalized = from.trim().toLowerCase();
-    if (blockedEmails.includes(fromNormalized)) {
+    const fromEmail = extractEmail(from);
+    if (blockedEmails.has(fromEmail)) {
+      console.info(`Blocked sendgrid forward for ${fromEmail}`);
       return NextResponse.json(
         { message: "Email received" },
         { status: 200 },
