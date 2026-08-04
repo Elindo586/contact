@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import sgMail from "@sendgrid/mail";
+import blockedEmails from "./blocked-emails.json";
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
@@ -33,6 +34,14 @@ export async function POST(req) {
     if (typeof subject !== "string" || subject.trim() === "") {
       throw new Error(
         "The 'subject' field is required and must be a non-empty string.",
+      );
+    }
+
+    const fromNormalized = from.trim().toLowerCase();
+    if (blockedEmails.includes(fromNormalized)) {
+      return NextResponse.json(
+        { message: "Email received" },
+        { status: 200 },
       );
     }
 
