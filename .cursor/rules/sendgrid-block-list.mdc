@@ -1,0 +1,15 @@
+---
+description: SendGrid contact forward block list — do not remove or weaken silent block before send
+globs: app/api/sendgrid/**
+alwaysApply: false
+---
+
+# SendGrid `/api/sendgrid` block list
+
+Before `sgMail.send`, the route must check `blocked-emails.json` via `extractEmail(from)` / `blockedEmails.has(...)`.
+
+- Keep the list in `app/api/sendgrid/blocked-emails.json` (imported into `route.js`).
+- Keep silent `200` on block (no SendGrid call).
+- Keep `extractEmail` so `Name <email@x.com>` still matches.
+- Forward remains: to `info@tu.biz`, from `edgar@teams.tu.biz`, replyTo = submitter.
+- This does **not** block normal email to team mailboxes — only POSTs to this API.
