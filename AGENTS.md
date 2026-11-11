@@ -10,9 +10,9 @@ Don't modify working code unrelated to the request.
 
 | Piece | Detail |
 |-------|--------|
-| List file | `app/api/sendgrid/blocked-emails.json` — lowercase bare addresses |
-| Route | `app/api/sendgrid/route.js` imports the JSON, builds a `Set` |
-| Match | `extractEmail(from)` — handles plain `email@x.com` and `Name <email@x.com>` |
+| List file | `app/api/sendgrid/blocked-emails.json` — lowercase bare addresses, plus `@domain` lines at the bottom |
+| Route | `app/api/sendgrid/route.js` imports the JSON, builds a `Set` of addresses and a `Set` of domains |
+| Match | From, and Reply-To when the body or a `Reply-To:` header has one. `extractEmail` handles plain `email@x.com` and `Name <email@x.com>`. A full address must match exactly. An entry that starts with `@` matches that domain only (`@tu.biz` matches `a@tu.biz`, not `a@teams.tu.biz`) |
 | Blocked response | `200` `{ message: "Email received" }` — do **not** call SendGrid; silent so bots don't learn |
 | Forwarded mail | Always **to** `info@tu.biz`, **from** `edgar@teams.tu.biz`, **replyTo** = submitter `from` |
 | Log | `Blocked sendgrid forward for {email}` on block (check host logs when debugging) |
@@ -27,14 +27,15 @@ If `info@tu.biz` shows **From: elindo586@gmail.com** (not `edgar@teams.tu.biz`),
 
 ### How to add a blocker
 
-1. Append the address (lowercase) to `app/api/sendgrid/blocked-emails.json`.
+1. Append the address (lowercase), or `@domain`, to `app/api/sendgrid/blocked-emails.json`.
 2. Deploy. Confirm host is on the commit that includes the JSON + route.
-3. Test with POST `from` exactly that address (or `Name <that@address>`). Expect no new mail at `info@tu.biz`; host logs should show the blocked line.
+3. Test with POST `from` exactly that address (or `Name <that@address>`), or with that domain on `from` or `replyTo`. Expect no new mail at `info@tu.biz`; host logs should show the blocked line.
 
 ### Forbidden shortcuts
 
 - Stripping the block check or returning an error that reveals the block to scrapers (prefer silent `200`)
 - Matching only raw `from.trim().toLowerCase()` without `extractEmail` (misses `Name <email>`)
+- Applying `@teams.tu.biz` or `@tu.biz` to the envelope the route writes. Allowed mail still goes **from** `edgar@teams.tu.biz` **to** `info@tu.biz`. The domain list is only the incoming From and Reply-To.
 - Assuming the request body `to` is used for delivery — it is validated but SendGrid always sends to `info@tu.biz`
 - Expecting this list to replace spam filters on `team05` / personal inboxes
 

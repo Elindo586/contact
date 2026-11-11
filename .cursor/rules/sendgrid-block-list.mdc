@@ -6,10 +6,10 @@ alwaysApply: false
 
 # SendGrid `/api/sendgrid` block list
 
-Before `sgMail.send`, the route must check `blocked-emails.json` via `extractEmail(from)` / `blockedEmails.has(...)`.
+Before `sgMail.send`, the route must check `blocked-emails.json` on the incoming From and on Reply-To (posted `replyTo` / `reply_to` / `reply-to`, or a `Reply-To:` line in `headers`). A full address matches exactly. An entry that starts with `@` matches that domain only (`@tu.biz` matches `a@tu.biz`, not `a@teams.tu.biz`).
 
-- Keep the list in `app/api/sendgrid/blocked-emails.json` (imported into `route.js`).
+- Keep the list in `app/api/sendgrid/blocked-emails.json` (imported into `route.js`). Domain lines (`@team06.tu.biz`, `@teams.tu.biz`, `@team05.tu.biz`, `@tu.biz`) stay at the bottom.
 - Keep silent `200` on block (no SendGrid call).
 - Keep `extractEmail` so `Name <email@x.com>` still matches.
-- Forward remains: to `info@tu.biz`, from `edgar@teams.tu.biz`, replyTo = submitter.
+- Forward remains: to `info@tu.biz`, from `edgar@teams.tu.biz`, replyTo = submitter. Do not run the domain list against that envelope. Those two addresses are written on every allowed forward.
 - This does **not** block normal email to team mailboxes — only POSTs to this API.

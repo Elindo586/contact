@@ -13,23 +13,67 @@ function extractEmail(value) {
   return match ? match[0].toLowerCase() : candidate;
 }
 
-const blockedEmails = new Set(
-  (Array.isArray(blockedEmailsJson)
+const blockList = (
+  Array.isArray(blockedEmailsJson)
     ? blockedEmailsJson
     : blockedEmailsJson?.default || []
-  )
+)
+  .map((entry) => String(entry).trim().toLowerCase())
+  .filter(Boolean);
+
+/** "@tu.biz" matches a@tu.biz only. It does not match a@teams.tu.biz. */
+const blockedDomains = new Set(
+  blockList.filter((entry) => entry.startsWith("@")),
+);
+
+const blockedEmails = new Set(
+  blockList
+    .filter((entry) => !entry.startsWith("@"))
     .map((email) => extractEmail(email))
     .filter(Boolean),
 );
 
+function fieldString(value) {
+  return typeof value === "string" ? value : "";
+}
+
+/** First blocked address in a From or Reply-To value, or "". */
+function blockedMatch(value) {
+  const raw = fieldString(value);
+  if (!raw.trim()) return "";
+  const found = raw.match(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/gi) || [];
+  const emails = found.map((email) => email.toLowerCase());
+  if (!emails.length) {
+    const one = extractEmail(raw);
+    if (one.includes("@")) emails.push(one);
+  }
+  for (const email of emails) {
+    if (blockedEmails.has(email)) return email;
+    const at = email.lastIndexOf("@");
+    if (at !== -1 && blockedDomains.has(email.slice(at))) return email;
+  }
+  return "";
+}
+
+/** Reply-To from a posted field, or from a SendGrid inbound headers blob. */
+function incomingReplyTo(direct, headers) {
+  const posted = fieldString(direct).trim();
+  if (posted) return posted;
+  const headerText = fieldString(headers);
+  const line = headerText.match(/^reply-to:\s*(.+)$/im);
+  return line ? line[1].trim() : "";
+}
+
 export async function POST(req) {
   try {
-    let from, to, subject, text, html;
+    let from, to, subject, text, html, replyTo, headers;
     const contentType = req.headers.get("content-type") || "";
 
     if (contentType.includes("application/json")) {
       const body = await req.json();
       ({ from, to, subject, text, html } = body);
+      replyTo = body.replyTo || body.reply_to || body["reply-to"];
+      headers = body.headers;
     } else {
       const formData = await req.formData();
       from = formData.get("from");
@@ -37,6 +81,11 @@ export async function POST(req) {
       subject = formData.get("subject");
       text = formData.get("text");
       html = formData.get("html");
+      replyTo =
+        formData.get("replyTo") ||
+        formData.get("reply_to") ||
+        formData.get("reply-to");
+      headers = formData.get("headers");
     }
 
     if (typeof from !== "string" || from.trim() === "") {
@@ -55,9 +104,12 @@ export async function POST(req) {
       );
     }
 
-    const fromEmail = extractEmail(from);
-    if (blockedEmails.has(fromEmail)) {
-      console.info(`Blocked sendgrid forward for ${fromEmail}`);
+    const blocked =
+      blockedMatch(from) ||
+      blockedMatch(replyTo) ||
+      blockedMatch(incomingReplyTo("", headers));
+    if (blocked) {
+      console.info(`Blocked sendgrid forward for ${blocked}`);
       return NextResponse.json(
         { message: "Email received" },
         { status: 200 },
